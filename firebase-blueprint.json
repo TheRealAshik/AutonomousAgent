@@ -1,0 +1,188 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile and workspace preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "photoURL": { "type": "string", "maxLength": 1024 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "preferredModel": { "type": "string", "maxLength": 64 },
+        "defaultRepo": { "type": "string", "maxLength": 128 }
+      },
+      "required": ["uid", "email", "createdAt"]
+    },
+    "GithubConnection": {
+      "title": "GithubConnection",
+      "description": "Connected GitHub account metadata (PAT is securely kept/encrypted server-side)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "githubUsername": { "type": "string", "maxLength": 100 },
+        "avatarUrl": { "type": "string", "maxLength": 1024 },
+        "scopes": { "type": "string", "maxLength": 512 },
+        "tokenType": { "type": "string", "maxLength": 64 },
+        "connectedAt": { "type": "string", "format": "date-time" },
+        "lastValidatedAt": { "type": "string", "format": "date-time" },
+        "encryptedToken": { "type": "string", "maxLength": 1024 }
+      },
+      "required": ["id", "userId", "githubUsername", "connectedAt"]
+    },
+    "SelectedRepository": {
+      "title": "SelectedRepository",
+      "description": "User accessible repository selected for agent actions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 128 },
+        "fullName": { "type": "string", "maxLength": 256 },
+        "owner": { "type": "string", "maxLength": 100 },
+        "defaultBranch": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 1024 },
+        "isPrivate": { "type": "boolean" },
+        "htmlUrl": { "type": "string", "maxLength": 1024 },
+        "selectedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "fullName", "owner", "name", "defaultBranch"]
+    },
+    "AgentSession": {
+      "title": "AgentSession",
+      "description": "Autonomous development session and execution state",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "repoFullName": { "type": "string", "maxLength": 256 },
+        "repoDefaultBranch": { "type": "string", "maxLength": 100 },
+        "agentBranch": { "type": "string", "maxLength": 128 },
+        "prompt": { "type": "string", "maxLength": 4096 },
+        "status": { "type": "string", "enum": ["analyzing", "planning", "waiting_approval", "executing", "validating", "completed", "failed", "cancelled", "paused"] },
+        "modelUsed": { "type": "string", "maxLength": 64 },
+        "thinkingLevel": { "type": "string", "maxLength": 32 },
+        "objective": { "type": "string", "maxLength": 1024 },
+        "problemAnalysis": { "type": "string", "maxLength": 8192 },
+        "proposedSolution": { "type": "string", "maxLength": 8192 },
+        "implementationStrategy": { "type": "string", "maxLength": 8192 },
+        "testingStrategy": { "type": "string", "maxLength": 4096 },
+        "potentialRisks": { "type": "string", "maxLength": 4096 },
+        "pullRequestUrl": { "type": "string", "maxLength": 1024 },
+        "pullRequestNumber": { "type": "integer" },
+        "commitSha": { "type": "string", "maxLength": 64 },
+        "googleTasksSyncStatus": { "type": "string", "maxLength": 64 },
+        "googleDriveReportUrl": { "type": "string", "maxLength": 1024 },
+        "googleKeepNoteId": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "repoFullName", "prompt", "status", "createdAt"]
+    },
+    "AgentTask": {
+      "title": "AgentTask",
+      "description": "Decomposed execution task with dependencies and acceptance criteria",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "sessionId": { "type": "string", "maxLength": 64 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 256 },
+        "description": { "type": "string", "maxLength": 4096 },
+        "status": { "type": "string", "enum": ["pending", "in_progress", "completed", "failed", "blocked", "skipped"] },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+        "googleTaskId": { "type": "string", "maxLength": 128 },
+        "result": { "type": "string", "maxLength": 8192 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "sessionId", "userId", "title", "description", "status", "priority"]
+    },
+    "ExecutionEvent": {
+      "title": "ExecutionEvent",
+      "description": "Real-time timeline event during development workflow",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "sessionId": { "type": "string", "maxLength": 64 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["info", "stage_change", "task_update", "tool_call", "git_commit", "validation", "error", "success"] },
+        "stage": { "type": "string", "maxLength": 64 },
+        "message": { "type": "string", "maxLength": 2048 },
+        "details": { "type": "string", "maxLength": 8192 },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "sessionId", "userId", "type", "message", "timestamp"]
+    },
+    "IntegrationStatus": {
+      "title": "IntegrationStatus",
+      "description": "Status and configuration of external workspace integrations",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "provider": { "type": "string", "enum": ["github", "google_drive", "google_tasks", "google_keep"] },
+        "connected": { "type": "boolean" },
+        "accountIdentifier": { "type": "string", "maxLength": 256 },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string", "maxLength": 1024 }
+      },
+      "required": ["id", "userId", "provider", "connected", "updatedAt"]
+    },
+    "Artifact": {
+      "title": "Artifact",
+      "description": "Generated reports, architectural summaries, and execution logs",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "sessionId": { "type": "string", "maxLength": 64 },
+        "type": { "type": "string", "enum": ["plan", "report", "test_result", "architecture", "diff"] },
+        "title": { "type": "string", "maxLength": 256 },
+        "content": { "type": "string", "maxLength": 65536 },
+        "driveFileId": { "type": "string", "maxLength": 128 },
+        "driveViewUrl": { "type": "string", "maxLength": 1024 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "sessionId", "type", "title", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "UserProfile",
+      "description": "User profile and settings"
+    },
+    "/users/{uid}/githubConnections/{connectionId}": {
+      "schema": "GithubConnection",
+      "description": "User's GitHub connection metadata"
+    },
+    "/users/{uid}/repositories/{repositoryId}": {
+      "schema": "SelectedRepository",
+      "description": "Repositories selected by the user"
+    },
+    "/users/{uid}/agentSessions/{sessionId}": {
+      "schema": "AgentSession",
+      "description": "Autonomous development execution sessions"
+    },
+    "/users/{uid}/agentSessions/{sessionId}/tasks/{taskId}": {
+      "schema": "AgentTask",
+      "description": "Decomposed tasks for a session"
+    },
+    "/users/{uid}/agentSessions/{sessionId}/events/{eventId}": {
+      "schema": "ExecutionEvent",
+      "description": "Audit and timeline events for session"
+    },
+    "/users/{uid}/integrations/{integrationId}": {
+      "schema": "IntegrationStatus",
+      "description": "Workspace and service integration statuses"
+    },
+    "/users/{uid}/artifacts/{artifactId}": {
+      "schema": "Artifact",
+      "description": "Persistent development artifacts and reports"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "OctoAgent AI - Autonomous GitHub Development Agent",
+  "description": "An autonomous AI software development agent that connects with GitHub repositories, analyzes issues, plans architectural tasks, generates atomic commits and PRs, and synchronizes with Google Workspace.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

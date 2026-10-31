@@ -1,0 +1,91 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-\\.:]+$');
+    }
+
+    // Connectivity test document
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // User Profile
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create, update: if isOwner(userId);
+      allow delete: if false;
+
+      // GitHub Connections metadata
+      match /githubConnections/{connectionId} {
+        allow get: if isOwner(userId) && isValidId(connectionId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(connectionId);
+        allow delete: if isOwner(userId) && isValidId(connectionId);
+      }
+
+      // Repositories
+      match /repositories/{repositoryId} {
+        allow get: if isOwner(userId) && isValidId(repositoryId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(repositoryId);
+        allow delete: if isOwner(userId) && isValidId(repositoryId);
+      }
+
+      // Agent Sessions
+      match /agentSessions/{sessionId} {
+        allow get: if isOwner(userId) && isValidId(sessionId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(sessionId);
+        allow delete: if isOwner(userId) && isValidId(sessionId);
+
+        // Tasks subcollection
+        match /tasks/{taskId} {
+          allow get: if isOwner(userId) && isValidId(taskId);
+          allow list: if isOwner(userId);
+          allow create, update: if isOwner(userId) && isValidId(taskId);
+          allow delete: if isOwner(userId) && isValidId(taskId);
+        }
+
+        // Events subcollection
+        match /events/{eventId} {
+          allow get: if isOwner(userId) && isValidId(eventId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId) && isValidId(eventId);
+          allow update: if false; // Events are append-only audit trail
+          allow delete: if isOwner(userId) && isValidId(eventId);
+        }
+      }
+
+      // Integrations status
+      match /integrations/{integrationId} {
+        allow get: if isOwner(userId) && isValidId(integrationId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(integrationId);
+        allow delete: if isOwner(userId) && isValidId(integrationId);
+      }
+
+      // Artifacts
+      match /artifacts/{artifactId} {
+        allow get: if isOwner(userId) && isValidId(artifactId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(artifactId);
+        allow delete: if isOwner(userId) && isValidId(artifactId);
+      }
+    }
+  }
+}
